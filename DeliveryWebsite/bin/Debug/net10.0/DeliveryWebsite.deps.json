@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "DeliveryWebsite/1.0.0": {
+        "runtime": {
+          "DeliveryWebsite.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DeliveryWebsite/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

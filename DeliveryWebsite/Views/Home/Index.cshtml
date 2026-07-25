@@ -1,0 +1,40 @@
+﻿@model DeliveryWebsite.Models.OrderModel
+
+@{
+    ViewData["Title"] = "طلب توصيل";
+}
+
+<div class="container mt-5" style="max-width: 500px;" dir="rtl">
+    <div class="card shadow p-4">
+        <h2 class="text-center mb-4 text-success">طلب توصيل سريع 🛵</h2>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form asp-action="Index" method="post">
+            <div class="mb-3">
+                <label class="form-label fw-bold">الاسم الكريم:</label>
+                <input asp-for="CustomerName" class="form-control" required placeholder="أدخل اسمك" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">رقم التليفون:</label>
+                <input asp-for="PhoneNumber" class="form-control" required placeholder="03xxxxxx أو 70xxxxxx" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">الموقع / العنوان:</label>
+                <input asp-for="Location" class="form-control" required placeholder="المنطقة، الشارع، بناء..." />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">الطلب:</label>
+                <textarea asp-for="OrderDetails" class="form-control" rows="3" required placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 py-2 fw-bold fs-5">إرسال الطلب عبر الواتساب</button>
+        </form>
+    </div>
+</div>
