@@ -33,6 +33,19 @@
                 <label class="form-label fw-bold">الطلب:</label>
                 <textarea asp-for="OrderDetails" class="form-control" rows="3" required placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
             </div>
+            <div class="mb-3">
+    <label for="address" class="form-label">عنوان التوصيل</label>
+    <div class="input-group">
+        <input type="text" id="address" name="Address" class="form-label form-control" placeholder="اكتب عنوانك التفصيلي أو اضغط زر الموقع">
+        <button type="button" class="btn btn-outline-secondary" onclick="getCustomerLocation()">
+            <i class="bi bi-geo-alt-fill"></i> تحديد موقعي الحالي
+        </button>
+    </div>
+</div>
+
+<!-- حقول مخفية (Hidden Inputs) لحفظ خط العرض والطول وإرسالهم مع الـ Form للـ Backend -->
+<input type="hidden" id="latitude" name="Latitude" />
+<input type="hidden" id="longitude" name="Longitude" />
 
             <button type="submit" class="btn btn-success w-100 py-2 fw-bold fs-5">إرسال الطلب عبر الواتساب</button>
         </form>
