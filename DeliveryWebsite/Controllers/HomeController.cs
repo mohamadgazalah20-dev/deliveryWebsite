@@ -40,6 +40,21 @@ public IActionResult Index(OrderModel model)
     string whatsappUrl = $"https://wa.me/{myPhoneNumber}?text={encodedMessage}";
 
     return Redirect(whatsappUrl);
+    [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> CreateOrder(OrderModel model)
+{
+    if (ModelState.IsValid)
+    {
+        // القيم Latitude و Longitude ستصل هنا تلقائياً من الحقول المخفية
+        _context.Orders.Add(model);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("OrderSuccess"); // أو الصفحة التي تفضلها بعد الطلب
+    }
+    
+    return View(model);
+}
 }
     }
 }

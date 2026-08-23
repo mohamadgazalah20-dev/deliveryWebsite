@@ -42,6 +42,47 @@
         </button>
     </div>
 </div>
+@model YourNamespace.Models.OrderModel
+
+<form asp-action="CreateOrder" method="post">
+    <div class="mb-3">
+        <label class="form-label">عنوان التوصيل بالتفصيل</label>
+        <div class="input-group">
+            <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اكتب العنوان أو اضغط زر تحديد الموقع" required />
+            <button type="button" class="btn btn-outline-primary" onclick="getCustomerLocation()">
+                📍 تحديد موقعي الحالي
+            </button>
+        </div>
+    </div>
+
+    <!-- حقول مخفية للإحداثيات تُرسل تلقائياً مع الطلب -->
+    <input type="hidden" asp-for="Latitude" id="latitude" />
+    <input type="hidden" asp-for="Longitude" id="longitude" />
+
+    <button type="submit" class="btn btn-success mt-3">إرسال الطلب</button>
+</form>
+
+<script>
+    function getCustomerLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // جلب خطوط الطول والعرض الحقيقية من الهاتف أو الكمبيوتر
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                    
+                    alert("✅ تم تحديد موقعك بنجاح!");
+                },
+                function(error) {
+                    alert("❌ فشل تحديد الموقع. يجدر التأكد من تفعيل الـ GPS والسماح للمتصفح.");
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
+        }
+    }
+</script>
 
 <!-- حقول مخفية (Hidden Inputs) لحفظ خط العرض والطول وإرسالهم مع الـ Form للـ Backend -->
 <input type="hidden" id="latitude" name="Latitude" />
