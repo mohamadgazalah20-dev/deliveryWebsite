@@ -1,10 +1,10 @@
 ﻿@model DeliveryWebsite.Models.OrderModel
 
 @{
-    ViewData["Title"] = "طلب توصيل";
+    ViewData["Title"] = "طلب توصيل سريع";
 }
 
-<div class="container mt-5" style="max-width: 500px;" dir="rtl">
+<div class="container mt-5">
     <div class="card shadow p-4">
         <h2 class="text-center mb-4 text-success">طلب توصيل سريع 🛵</h2>
 
@@ -13,139 +13,74 @@
             <div class="alert alert-danger">@ViewBag.Error</div>
         }
 
-        <form asp-action="Index" method="post">
+        <form asp-controller="Home" asp-action="Index" method="post">
+            
             <div class="mb-3">
-                <label class="form-label fw-bold">الاسم الكريم:</label>
-                <input asp-for="CustomerName" class="form-control" required placeholder="أدخل اسمك" />
+                <label class="form-label">الاسم الكريم:</label>
+                <input type="text" asp-for="CustomerName" class="form-control" placeholder="أدخل اسمك" required />
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-bold">رقم التليفون:</label>
-                <input asp-for="PhoneNumber" class="form-control" required placeholder="03xxxxxx أو 70xxxxxx" />
+                <label class="form-label">رقم التليفون:</label>
+                <input type="text" asp-for="PhoneNumber" class="form-control" placeholder="03xxxxxx أو 70xxxxxx" required />
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-bold">الموقع / العنوان:</label>
-                <input asp-for="Location" class="form-control" required placeholder="المنطقة، الشارع، بناء..." />
+                <label class="form-label">الموقع / العنوان:</label>
+                <input type="text" asp-for="Location" id="locationInput" class="form-control" placeholder="المنطقة، الشارع، بناء..." required />
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-bold">الطلب:</label>
-                <textarea asp-for="OrderDetails" class="form-control" rows="3" required placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
+                <label class="form-label">تفاصيل الطلب:</label>
+                <textarea asp-for="OrderDetails" class="form-control" rows="3" placeholder="اكتب تفاصيل طلبك هنا..." required></textarea>
             </div>
+
             <div class="mb-3">
-    <label for="address" class="form-label">عنوان التوصيل</label>
-    <div class="input-group">
-        <input type="text" id="address" name="Address" class="form-label form-control" placeholder="اكتب عنوانك التفصيلي أو اضغط زر الموقع">
-        <button type="button" class="btn btn-outline-secondary" onclick="getCustomerLocation()">
-            <i class="bi bi-geo-alt-fill"></i> تحديد موقعي الحالي
-        </button>
-    </div>
-</div>
-@model YourNamespace.Models.OrderModel
+                <label class="form-label">عنوان التوصيل (الموقع الجغرافي)</label>
+                <div class="input-group">
+                    <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اضغط زر تحديد الموقع" readonly />
+                    <button type="button" class="btn btn-outline-primary" onclick="getCustomerLocation()">
+                        📍 تحديد موقعي الحالي
+                    </button>
+                </div>
+            </div>
 
-<form asp-action="CreateOrder" method="post">
-    <div class="mb-3">
-        <label class="form-label">عنوان التوصيل بالتفصيل</label>
-        <div class="input-group">
-            <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اكتب العنوان أو اضغط زر تحديد الموقع" required />
-            <button type="button" class="btn btn-outline-primary" onclick="getCustomerLocation()">
-                📍 تحديد موقعي الحالي
-            </button>
-        </div>
-    </div>
+            <!-- حقول مخفية للإحداثيات إذا أردت استخدامها لاحقاً -->
+            <input type="hidden" asp-for="Latitude" id="latitude" />
+            <input type="hidden" asp-for="Longitude" id="longitude" />
 
-    <!-- حقول مخفية للإحداثيات تُرسل تلقائياً مع الطلب -->
-    <input type="hidden" asp-for="Latitude" id="latitude" />
-    <input type="hidden" asp-for="Longitude" id="longitude" />
-
-    <button type="submit" class="btn btn-success mt-3">إرسال الطلب</button>
-</form>
-
-<script>
-    function getCustomerLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    // جلب خطوط الطول والعرض الحقيقية من الهاتف أو الكمبيوتر
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                    
-                    alert("✅ تم تحديد موقعك بنجاح!");
-                },
-                function(error) {
-                    alert("❌ فشل تحديد الموقع. يجدر التأكد من تفعيل الـ GPS والسماح للمتصفح.");
-                },
-                { enableHighAccuracy: true }
-            );
-        } else {
-            alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
-        }
-    }
-</script>
-<script>
-    let currentLat = "";
-    let currentLng = "";
-
-    // 1. دالة جلب الموقع عند الضغط على زر تحديد الموقع
-    function getCustomerLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    currentLat = position.coords.latitude;
-                    currentLng = position.coords.longitude;
-                    
-                    // تعبئة حقل العنوان أو إعلام الزبون أن الموقع تم تحديده
-                    alert("✅ تم تحديد موقعك بنجاح!");
-                },
-                function(error) {
-                    alert("❌ فشل تحديد الموقع. يجدر التأكد من تفعيل الـ GPS.");
-                },
-                { enableHighAccuracy: true }
-            );
-        } else {
-            alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
-        }
-    }
-
-    // 2. دالة إرسال الطلب عبر الواتساب مع تضمين الإحداثيات
-    function sendToWhatsApp(event) {
-        event.preventDefault(); // منع الإرسال العادي للـ Form
-
-        const name = document.getElementById("name").value;
-        const phone = document.getElementById("phone").value;
-        const address = document.getElementById("address").value;
-        const note = document.getElementById("note").value;
-
-        // رقم واتساب المطعم الذي سيتلقى الطلب (ضع رقمك أو رقم المطعم هنا)
-        const restaurantPhone = "961XXXXXXXX"; 
-
-        // بناء نص الرسالة
-        let message = `طلب توصيل جديد 🛵\n\n` +
-                      `👤 الاسم: ${name}\n` +
-                      `📞 الهاتف: ${phone}\n` +
-                      `📍 العنوان: ${address}\n` +
-                      `📝 الطلب: ${note}\n`;
-
-        // إذا تم تحديد الموقع، نضيف رابط خرائط جوجل للرسالة
-        if (currentLat && currentLng) {
-            const mapsLink = `https://www.google.com/maps?q=${currentLat},${currentLng}`;
-            message += `🗺️ موقع الزبون على الخريطة:\n${mapsLink}`;
-        } else {
-            message += `⚠️ لم يتم إرسال الموقع الجغرافي.`;
-        }
-
-        // فتح تطبيق الواتساب بالرسالة الجاهزة
-        const encodedMessage = encodeURIComponent(message);
-        window.open(`https://wa.me/${restaurantPhone}?text=${encodedMessage}`, '_blank');
-    }
-</script>
-
-<!-- حقول مخفية (Hidden Inputs) لحفظ خط العرض والطول وإرسالهم مع الـ Form للـ Backend -->
-<input type="hidden" id="latitude" name="Latitude" />
-<input type="hidden" id="longitude" name="Longitude" />
-
-            <button type="submit" class="btn btn-success w-100 py-2 fw-bold fs-5">إرسال الطلب عبر الواتساب</button>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success btn-lg">إرسال الطلب عبر الواتساب</button>
+            </div>
         </form>
     </div>
 </div>
+
+<script>
+    function getCustomerLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // تعبئة الإحداثيات بالحقول المخفية
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+                    
+                    // وضع رابط خرائط جوجل بشكل مباشر بحقل العنوان لتسهيل الوصول
+                    document.getElementById('address').value = `خط العرض: ${lat}, خط الطول: ${lng}`;
+                    document.getElementById('locationInput').value = `موقع جغرافي (خرائط جوجل)`;
+                    
+                    alert("✅ تم تحديد موقعك بنجاح!");
+                },
+                function(error) {
+                    alert("❌ فشل تحديد الموقع. تأكد من تفعيل الـ GPS والسماح للمتصفح.");
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
+        }
+    }
+</script>
