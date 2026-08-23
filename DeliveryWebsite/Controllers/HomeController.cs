@@ -5,56 +5,40 @@ namespace DeliveryWebsite.Controllers
 {
     public class HomeController : Controller
     {
+        // 1. صفحة العرض (GET)
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-       [HttpPost]
-public IActionResult Index(OrderModel model)
-{
-    if (string.IsNullOrWhiteSpace(model.CustomerName) || 
-        string.IsNullOrWhiteSpace(model.PhoneNumber) || 
-        string.IsNullOrWhiteSpace(model.Location) || 
-        string.IsNullOrWhiteSpace(model.OrderDetails))
-    {
-        ViewBag.Error = "الرجاء تعبئة جميع الحقول!";
-        return View(model);
-    }
+        // 2. دالة استقبال الطلب عبر الـ Form (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(OrderModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.CustomerName) ||
+                string.IsNullOrWhiteSpace(model.PhoneNumber) ||
+                string.IsNullOrWhiteSpace(model.Location) ||
+                string.IsNullOrWhiteSpace(model.OrderDetails))
+            {
+                ViewBag.Error = "الرجاء تعبئة جميع الحقول!";
+                return View(model);
+            }
 
-    // تجهيز نص الرسالة بشكل طبيعي تماماً بدون %0A
-    string message = $"طلب توصيل جديد عبر الموقع! 🚀\n" +
-                     $"------------------\n" +
-                     $"👤 الاسم: {model.CustomerName}\n" +
-                     $"📞 الهاتف: {model.PhoneNumber}\n" +
-                     $"📍 الموقع: {model.Location}\n" +
-                     $"🛒 الطلب: {model.OrderDetails}";
+            // تجهيز رسالة الواتساب
+            string message = $"طلب توصيل جديد عبر الموقع 🛵\n" +
+                             $"--------------------\n" +
+                             $"👤 الاسم: {model.CustomerName}\n" +
+                             $"📞 الهاتف: {model.PhoneNumber}\n" +
+                             $"📍 الموقع: {model.Location}\n" +
+                             $"🛒 الطلب: {model.OrderDetails}";
 
-    // رقم هاتفك
-    string myPhoneNumber = "96171708532"; 
+            string myPhoneNumber = "96171708532";
+            string encodedMessage = Uri.EscapeDataString(message);
+            string whatsappUrl = $"https://wa.me/{myPhoneNumber}?text={encodedMessage}";
 
-    // تحويل النص العربي والرموز تلقائياً إلى صيغة آمنة للرابط
-    string encodedMessage = Uri.EscapeDataString(message);
-
-    string whatsappUrl = $"https://wa.me/{myPhoneNumber}?text={encodedMessage}";
-
-    return Redirect(whatsappUrl);
-    [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> CreateOrder(OrderModel model)
-{
-    if (ModelState.IsValid)
-    {
-        // القيم Latitude و Longitude ستصل هنا تلقائياً من الحقول المخفية
-        _context.Orders.Add(model);
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction("OrderSuccess"); // أو الصفحة التي تفضلها بعد الطلب
-    }
-    
-    return View(model);
-}
-}
+            return Redirect(whatsappUrl);
+        }
     }
 }

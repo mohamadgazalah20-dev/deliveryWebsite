@@ -83,6 +83,63 @@
         }
     }
 </script>
+<script>
+    let currentLat = "";
+    let currentLng = "";
+
+    // 1. دالة جلب الموقع عند الضغط على زر تحديد الموقع
+    function getCustomerLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    currentLat = position.coords.latitude;
+                    currentLng = position.coords.longitude;
+                    
+                    // تعبئة حقل العنوان أو إعلام الزبون أن الموقع تم تحديده
+                    alert("✅ تم تحديد موقعك بنجاح!");
+                },
+                function(error) {
+                    alert("❌ فشل تحديد الموقع. يجدر التأكد من تفعيل الـ GPS.");
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
+        }
+    }
+
+    // 2. دالة إرسال الطلب عبر الواتساب مع تضمين الإحداثيات
+    function sendToWhatsApp(event) {
+        event.preventDefault(); // منع الإرسال العادي للـ Form
+
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const address = document.getElementById("address").value;
+        const note = document.getElementById("note").value;
+
+        // رقم واتساب المطعم الذي سيتلقى الطلب (ضع رقمك أو رقم المطعم هنا)
+        const restaurantPhone = "961XXXXXXXX"; 
+
+        // بناء نص الرسالة
+        let message = `طلب توصيل جديد 🛵\n\n` +
+                      `👤 الاسم: ${name}\n` +
+                      `📞 الهاتف: ${phone}\n` +
+                      `📍 العنوان: ${address}\n` +
+                      `📝 الطلب: ${note}\n`;
+
+        // إذا تم تحديد الموقع، نضيف رابط خرائط جوجل للرسالة
+        if (currentLat && currentLng) {
+            const mapsLink = `https://www.google.com/maps?q=${currentLat},${currentLng}`;
+            message += `🗺️ موقع الزبون على الخريطة:\n${mapsLink}`;
+        } else {
+            message += `⚠️ لم يتم إرسال الموقع الجغرافي.`;
+        }
+
+        // فتح تطبيق الواتساب بالرسالة الجاهزة
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://wa.me/${restaurantPhone}?text=${encodedMessage}`, '_blank');
+    }
+</script>
 
 <!-- حقول مخفية (Hidden Inputs) لحفظ خط العرض والطول وإرسالهم مع الـ Form للـ Backend -->
 <input type="hidden" id="latitude" name="Latitude" />
