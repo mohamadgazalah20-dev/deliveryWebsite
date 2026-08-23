@@ -35,13 +35,23 @@
                 <textarea asp-for="OrderDetails" class="form-control" rows="3" placeholder="اكتب تفاصيل طلبك هنا..." required></textarea>
             </div>
 
+            <!-- خيارات تحديد الموقع -->
             <div class="mb-3">
-                <label class="form-label">تحديد الموقع الجغرافي (اختياري لتسهيل التوصيل)</label>
-                <div class="input-group">
+                <label class="form-label">تحديد الموقع (اختر إحدى الطريقتين):</label>
+                
+                <!-- الطريقة الأولى: التحديد التلقائي -->
+                <div class="input-group mb-2">
                     <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اضغط زر تحديد موقعي الحالي" readonly />
                     <button type="button" class="btn btn-outline-primary" onclick="getCustomerLocation()">
-                        📍 تحديد موقعي الحالي
+                        📍 تحديد تلقائي
                     </button>
+                </div>
+
+                <!-- الطريقة الثانية: فتح خريطة جوجل يدوياً (لحل مشكلة الأذونات نهائياً) -->
+                <div class="d-grid">
+                    <a href="https://www.google.com/maps" target="_blank" class="btn btn-outline-secondary btn-sm">
+                        🗺️ افتح خرائط جوجل، انسخ رابط موقعك، والصقه في حقل العنوان التفصيلي أعلى
+                    </a>
                 </div>
             </div>
 
@@ -63,7 +73,7 @@
             return;
         }
 
-        alert("📍 جاري تحديد موقعك، يرجى الموافقة على رسالة الإذن في المتصفح إن ظهرت...");
+        alert("📍 جاري تحديد موقعك، يرجى الموافقة على رسالة الإذن في المتصفح...");
 
         const options = {
             enableHighAccuracy: true,
@@ -83,12 +93,7 @@
                 alert("✅ تم تحديد موقعك بنجاح!");
             },
             function(error) {
-                let errorMsg = "❌ تعذر تحديد الموقع. ";
-                if (error.code === error.PERMISSION_DENIED) {
-                    errorMsg += "يرجى السماح للمتصفح بالوصول إلى موقعك من إعدادات المتصفح (Location Permissions).";
-                } else {
-                    errorMsg += "تأكد من تفعيل الـ GPS لديك وإعادة المحاولة.";
-                }
+                let errorMsg = "❌ تعذر تحديد الموقع تلقائياً بسبب إعدادات المتصفح. يمكنك استخدام خيار (فتح خرائط جوجل) أدناه.";
                 alert(errorMsg);
             },
             options
