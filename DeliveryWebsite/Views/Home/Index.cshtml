@@ -4,7 +4,7 @@
     ViewData["Title"] = "طلب توصيل سريع";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <div class="card shadow p-4">
         <h2 class="text-center mb-4 text-success">طلب توصيل سريع 🛵</h2>
 
@@ -26,7 +26,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">الموقع / العنوان:</label>
+                <label class="form-label">الموقع / العنوان التفصيلي:</label>
                 <input type="text" asp-for="Location" id="locationInput" class="form-control" placeholder="المنطقة، الشارع، بناء..." required />
             </div>
 
@@ -36,20 +36,20 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">عنوان التوصيل (الموقع الجغرافي)</label>
+                <label class="form-label">تحديد الموقع الجغرافي (اختياري لتسهيل التوصيل)</label>
                 <div class="input-group">
-                    <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اضغط زر تحديد الموقع" readonly />
+                    <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اضغط زر تحديد موقعي الحالي" readonly />
                     <button type="button" class="btn btn-outline-primary" onclick="getCustomerLocation()">
                         📍 تحديد موقعي الحالي
                     </button>
                 </div>
             </div>
 
-            <!-- حقول مخفية للإحداثيات إذا أردت استخدامها لاحقاً -->
+            <!-- حقول مخفية للإحداثيات -->
             <input type="hidden" asp-for="Latitude" id="latitude" />
             <input type="hidden" asp-for="Longitude" id="longitude" />
 
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-2 mt-4">
                 <button type="submit" class="btn btn-success btn-lg">إرسال الطلب عبر الواتساب</button>
             </div>
         </form>
@@ -58,29 +58,40 @@
 
 <script>
     function getCustomerLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
-                    // تعبئة الإحداثيات بالحقول المخفية
-                    document.getElementById('latitude').value = lat;
-                    document.getElementById('longitude').value = lng;
-                    
-                    // وضع رابط خرائط جوجل بشكل مباشر بحقل العنوان لتسهيل الوصول
-                    document.getElementById('address').value = `خط العرض: ${lat}, خط الطول: ${lng}`;
-                    document.getElementById('locationInput').value = `موقع جغرافي (خرائط جوجل)`;
-                    
-                    alert("✅ تم تحديد موقعك بنجاح!");
-                },
-                function(error) {
-                    alert("❌ فشل تحديد الموقع. تأكد من تفعيل الـ GPS والسماح للمتصفح.");
-                },
-                { enableHighAccuracy: true }
-            );
-        } else {
+        if (!navigator.geolocation) {
             alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
+            return;
         }
+
+        alert("📍 جاري تحديد موقعك، يرجى الموافقة على رسالة الإذن في المتصفح إن ظهرت...");
+
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+                document.getElementById('address').value = `خط العرض: ${lat}, خط الطول: ${lng}`;
+                
+                alert("✅ تم تحديد موقعك بنجاح!");
+            },
+            function(error) {
+                let errorMsg = "❌ تعذر تحديد الموقع. ";
+                if (error.code === error.PERMISSION_DENIED) {
+                    errorMsg += "يرجى السماح للمتصفح بالوصول إلى موقعك من إعدادات المتصفح (Location Permissions).";
+                } else {
+                    errorMsg += "تأكد من تفعيل الـ GPS لديك وإعادة المحاولة.";
+                }
+                alert(errorMsg);
+            },
+            options
+        );
     }
 </script>
