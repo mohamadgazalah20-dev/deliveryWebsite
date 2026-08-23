@@ -45,7 +45,7 @@ namespace DeliveryWebsite.Controllers
             // رقم الهاتف الخاص بك لاستلام الطلبات (مع رمز الدولة)
             string myPhoneNumber = "96171708532";
             string encodedMessage = Uri.EscapeDataString(message);
-            string whatsappUrl = `https://wa.me/{myPhoneNumber}?text={encodedMessage}`;
+            string whatsappUrl = $"https://wa.me/{myPhoneNumber}?text={encodedMessage}";
 
             return Redirect(whatsappUrl);
         }
