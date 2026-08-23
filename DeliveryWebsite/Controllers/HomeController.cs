@@ -5,38 +5,47 @@ namespace DeliveryWebsite.Controllers
 {
     public class HomeController : Controller
     {
-        // 1. صفحة العرض (GET)
+        // صفحة العرض (GET)
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // 2. دالة استقبال الطلب عبر الـ Form (POST)
+        // استقبال الطلب وإرساله إلى الواتساب (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(OrderModel model)
+        public IActionResult Index(OrderModel model)
         {
             if (string.IsNullOrWhiteSpace(model.CustomerName) ||
                 string.IsNullOrWhiteSpace(model.PhoneNumber) ||
                 string.IsNullOrWhiteSpace(model.Location) ||
                 string.IsNullOrWhiteSpace(model.OrderDetails))
             {
-                ViewBag.Error = "الرجاء تعبئة جميع الحقول!";
+                ViewBag.Error = "الرجاء تعبئة جميع الحقول المطلوبة!";
                 return View(model);
             }
 
-            // تجهيز رسالة الواتساب
+            // تجهيز نص رسالة الواتساب
             string message = $"طلب توصيل جديد عبر الموقع 🛵\n" +
                              $"--------------------\n" +
                              $"👤 الاسم: {model.CustomerName}\n" +
                              $"📞 الهاتف: {model.PhoneNumber}\n" +
-                             $"📍 الموقع: {model.Location}\n" +
-                             $"🛒 الطلب: {model.OrderDetails}";
+                             $"📍 العنوان: {model.Location}\n";
 
+            // إضافة رابط الملاحة المباشر الذي يرسم الطريق لمنزل الزبون عند النقر عليه
+            if (!string.IsNullOrEmpty(model.Latitude) && !string.IsNullOrEmpty(model.Longitude))
+            {
+                string navigationLink = $"https://www.google.com/maps/dir/?api=1&destination={model.Latitude},{model.Longitude}";
+                message += $"🗺️ اضغط هنا لرسم الطريق إلى بيت الزبون:\n{navigationLink}\n";
+            }
+
+            message += $"🛒 الطلب: {model.OrderDetails}";
+
+            // رقم الهاتف الخاص بك لاستلام الطلبات (مع رمز الدولة)
             string myPhoneNumber = "96171708532";
             string encodedMessage = Uri.EscapeDataString(message);
-            string whatsappUrl = $"https://wa.me/{myPhoneNumber}?text={encodedMessage}";
+            string whatsappUrl = `https://wa.me/{myPhoneNumber}?text={encodedMessage}`;
 
             return Redirect(whatsappUrl);
         }

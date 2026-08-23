@@ -26,36 +26,28 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">الموقع / العنوان التفصيلي:</label>
-                <input type="text" asp-for="Location" id="locationInput" class="form-control" placeholder="المنطقة، الشارع، بناء..." required />
+                <label class="form-label">العنوان / المنطقة:</label>
+                <input type="text" asp-for="Location" class="form-control" placeholder="مثال: صيدا، الشارع الرئيسي" required />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">تفاصيل الطلب:</label>
-                <textarea asp-for="OrderDetails" class="form-control" rows="3" placeholder="اكتب تفاصيل طلبك هنا..." required></textarea>
+                <textarea asp-for="OrderDetails" class="form-control" rows="3" placeholder="اكتب طلباتك هنا..." required></textarea>
             </div>
 
-            <!-- خيارات تحديد الموقع -->
-            <div class="mb-3">
-                <label class="form-label">تحديد الموقع (اختر إحدى الطريقتين):</label>
-                
-                <!-- الطريقة الأولى: التحديد التلقائي -->
-                <div class="input-group mb-2">
-                    <input type="text" asp-for="Address" id="address" class="form-control" placeholder="اضغط زر تحديد موقعي الحالي" readonly />
-                    <button type="button" class="btn btn-outline-primary" onclick="getCustomerLocation()">
-                        📍 تحديد تلقائي
+            <!-- قسم تحديد الموقع الجغرافي -->
+            <div class="mb-3 bg-light p-3 rounded border">
+                <label class="form-label fw-bold text-primary">📍 تحديد الموقع (لترسيم طريق التوصيل بدقة):</label>
+                <div class="input-group">
+                    <input type="text" id="statusText" class="form-control bg-white" placeholder="اضغط زر تحديد الموقع بالأسفل" readonly />
+                    <button type="button" class="btn btn-primary" onclick="getLocation()">
+                        📍 حدد موقعي الآن
                     </button>
                 </div>
-
-                <!-- الطريقة الثانية: فتح خريطة جوجل يدوياً (لحل مشكلة الأذونات نهائياً) -->
-                <div class="d-grid">
-                    <a href="https://www.google.com/maps" target="_blank" class="btn btn-outline-secondary btn-sm">
-                        🗺️ افتح خرائط جوجل، انسخ رابط موقعك، والصقه في حقل العنوان التفصيلي أعلى
-                    </a>
-                </div>
+                <small class="text-muted d-block mt-1">اضغط على الزر ليقوم النظام بأخذ إحداثيات موقعك وإرسالها برابط مباشر.</small>
             </div>
 
-            <!-- حقول مخفية للإحداثيات -->
+            <!-- حقول مخفية لحفظ خط العرض وخط الطول -->
             <input type="hidden" asp-for="Latitude" id="latitude" />
             <input type="hidden" asp-for="Longitude" id="longitude" />
 
@@ -67,36 +59,24 @@
 </div>
 
 <script>
-    function getCustomerLocation() {
-        if (!navigator.geolocation) {
-            alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
-            return;
+    function getLocation() {
+        if (navigator.geolocation) {
+            document.getElementById('statusText').value = "جاري تحديد الموقع...";
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                    document.getElementById('statusText').value = "تم تحديد الموقع بنجاح ✅";
+                    alert("تم حفظ إحداثيات موقعك بنجاح! يمكنك إرسال الطلب الآن.");
+                },
+                function (error) {
+                    alert("تعذر تحديد الموقع تلقائياً. تأكد من تفعيل الـ GPS والسماح للمتصفح.");
+                    document.getElementById('statusText').value = "فشل التحديد، يرجى كتابة العنوان بوضوح";
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            alert("متصفحك لا يدعم تحديد الموقع.");
         }
-
-        alert("📍 جاري تحديد موقعك، يرجى الموافقة على رسالة الإذن في المتصفح...");
-
-        const options = {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        };
-
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lng;
-                document.getElementById('address').value = `خط العرض: ${lat}, خط الطول: ${lng}`;
-                
-                alert("✅ تم تحديد موقعك بنجاح!");
-            },
-            function(error) {
-                let errorMsg = "❌ تعذر تحديد الموقع تلقائياً بسبب إعدادات المتصفح. يمكنك استخدام خيار (فتح خرائط جوجل) أدناه.";
-                alert(errorMsg);
-            },
-            options
-        );
     }
 </script>
